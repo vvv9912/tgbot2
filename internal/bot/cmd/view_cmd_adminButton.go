@@ -24,7 +24,7 @@ func ViewCmdAdminButton() botkit.ViewFunc {
 			//tgbotapi.NewKeyboardButton("Корзина"),
 		),
 	)
-	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update) error {
+	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update, botInfo botkit.BotInfo) error {
 		msg := tgbotapi.NewMessage(update.FromChat().ID, "Меню добавлено")
 		msg.ReplyMarkup = numericKeyboard
 		if _, err := bot.Send(msg); err != nil {

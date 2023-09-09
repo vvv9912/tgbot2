@@ -99,15 +99,15 @@ func TestUsersPostgresStorage_GetStatusUserByTgID(t *testing.T) {
 	ctx := context.TODO()
 	var tgid int64
 	tgid = 1
-	status, err := s.GetStatusUserByTgID(ctx, tgid)
+	status, state, err := s.GetStatusUserByTgID(ctx, tgid)
 	if err != nil {
 		if err.Error() == bot.NoRows {
-			t.Logf("ok, status:%v", status)
+			t.Logf("ok, status:%v, state:%v", status, state)
 			err = nil
 		} else {
 			fmt.Println(err)
 			t.Fatalf("GetOrderByTgID: %v", err)
 		}
 	}
-	t.Logf("cout GetOrderByTgID tgid: %v, status:%v", tgid, status)
+	t.Logf("cout GetOrderByTgID tgid: %v, status:%v, state:%v", tgid, status, state)
 }

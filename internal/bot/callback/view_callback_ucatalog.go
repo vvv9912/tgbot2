@@ -1,4 +1,4 @@
-package bot
+package callback
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 
 func ViewCallbackUcatalog(s botkit.ProductsStorager) botkit.ViewFunc {
 
-	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update) error {
+	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update, botInfo botkit.BotInfo) error {
 		var Data botkit.BotCommand
 		err := json.Unmarshal([]byte(update.CallbackQuery.Data), &Data)
 		if err != nil {

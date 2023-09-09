@@ -44,9 +44,10 @@ func (s *UsersPostgresStorage) GetOrderByID(ctx context.Context, id int) ([]int6
 	//	return nil, err
 	//}
 	//defer conn.Close()
-	//var corz []int64
+	////var corz []int64
+	//var corz pq.Int64Array
 	//
-	//if err := conn.SelectContext(ctx, pq.Array(&corz), `SELECT corzina FROM users where id = $1`, id); err != nil {
+	//if err := conn.SelectContext(ctx, &corz, `SELECT corzina FROM users where id = $1`, id); err != nil {
 	//	return nil, err
 	//}
 	//
@@ -60,6 +61,7 @@ func (s *UsersPostgresStorage) GetOrderByID(ctx context.Context, id int) ([]int6
 	var corz []int64
 
 	row := conn.QueryRowContext(ctx, `SELECT corzina FROM users where id = $1`, id)
+
 	err = row.Scan(pq.Array(&corz))
 	if err != nil {
 		return nil, err
@@ -80,24 +82,25 @@ func (s *UsersPostgresStorage) GetOrderByTgID(ctx context.Context, tgID int64) (
 	}
 	return corz, nil
 }
-func (s *UsersPostgresStorage) GetStatusUserByTgID(ctx context.Context, tgID int64) (int, error) {
+func (s *UsersPostgresStorage) GetStatusUserByTgID(ctx context.Context, tgID int64) (int, int, error) {
 	conn, err := s.db.Connx(ctx)
 	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 	defer conn.Close()
 
 	var status int
-	row := conn.QueryRowContext(ctx, `SELECT status_user FROM users where tg_id = $1`, tgID)
-	err = row.Scan(&status)
+	var state int
+	row := conn.QueryRowContext(ctx, `SELECT status_user,state_user FROM users where tg_id = $1`, tgID)
+	err = row.Scan(&status, &state)
 	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 	//if err := conn.SelectContext(ctx, &status, `SELECT status_user FROM users WHERE tg_id = $1`, tgID); err != nil {
 	//	return 0, err
 	//}
 
-	return status, nil
+	return status, state, nil
 }
 
 //type dbOrders struct {

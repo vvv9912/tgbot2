@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	bot2 "tgbotv2/internal/bot"
 	bot "tgbotv2/internal/bot/callback"
 	"tgbotv2/internal/bot/cmd"
 	"tgbotv2/internal/bot/text"
@@ -33,14 +34,17 @@ func main() {
 	sProducts := storage.NewProductsPostgresStorage(db)
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
-
+	sUsers := storage.NewUsersPostgresStorage(db)
 	Ourbot := botkit.New(botAPI)
+
 	Ourbot.RegisterCmdView("start", cmd.ViewCmdStart())
 	Ourbot.RegisterCmdView("button", cmd.ViewCmdButton())
 	Ourbot.RegisterCmdView("adminbutton", cmd.ViewCmdAdminButton())
 
-	Ourbot.RegisterTextView("Каталог", text.ViewTextCatalog(sProducts))
+	Ourbot.RegisterTextView("Каталог", bot2.MwUsersOnly(sUsers, text.ViewTextCatalog(sProducts)))
+
 	Ourbot.RegisterCallbackView("/ucatalog", bot.ViewCallbackUcatalog(sProducts))
+
 	if err := Ourbot.Run(ctx); err != nil {
 		if !errors.Is(err, context.Canceled) {
 			log.Printf("[ERROR] failed to start bot: %v", err)

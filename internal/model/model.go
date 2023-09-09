@@ -31,7 +31,7 @@ type Orders struct {
 
 type Users struct {
 	id         int       `json:"id,omitempty"`
-	TgID       int       `json:"tg_id,omitempty"`
+	TgID       int64     `json:"tg_id,omitempty"`
 	StatusUser int       `json:"status_user,omitempty"`
 	StateUser  int       `json:"state_user,omitempty"`
 	Corzine    []int     `json:"corzine,omitempty"`

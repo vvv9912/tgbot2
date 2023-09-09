@@ -19,7 +19,8 @@ type ProductsStorager interface {
 	ProductsByCatalog(ctx context.Context, ctlg string) ([]model.Products, error)
 }
 type UsersStorager interface {
-	GetStatusUserByTgID(ctx context.Context, tgID int64) (int, error)
+	GetStatusUserByTgID(ctx context.Context, tgID int64) (int, int, error)
+	AddUser(ctx context.Context, users model.Users) error
 }
 type BotCommand struct {
 	Cmd  string `json:"cmd,omitempty"`
@@ -30,18 +31,31 @@ type Bot struct {
 	cmdViews      map[string]ViewFunc // комманды тг бота
 	textViews     map[string]ViewFunc
 	callbackViews map[string]ViewFunc
-	PStorager     ProductsStorager
+
+	//PStorager     ProductsStorager
+}
+type BotInfo struct {
+	TgId     int64
+	IdStatus int
+	IdState  int
 }
 
 // addcatalog
 // listZakazov
 // deleteCatalog id
-type ViewFunc func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update) error
+type ViewFunc func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update, botinfo BotInfo) error
 
 func New(api *tgbotapi.BotAPI) *Bot {
 	return &Bot{api: api}
 }
 
+//	type i interface {
+//		RegisterTextView(string, ViewFunc)
+//	}
+//
+//	func (b *Bot) Reegg(cmd string, ViewFunc func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update)) {
+//		fmt.Println("aa")
+//	}
 func (b *Bot) RegisterTextView(cmd string, view ViewFunc) {
 	if b.textViews == nil {
 		b.textViews = make(map[string]ViewFunc)
@@ -117,8 +131,9 @@ func (b *Bot) handleUpdate(ctx context.Context, update tgbotapi.Update) {
 			view = textView
 		}
 	}
-
-	if err := view(ctx, b.api, update); err != nil {
+	var botinfo BotInfo
+	botinfo.TgId = update.FromChat().ID
+	if err := view(ctx, b.api, update, botinfo); err != nil {
 		log.Printf("[ERROR] failed to handle update: %v", err)
 
 		if _, err := b.api.Send(

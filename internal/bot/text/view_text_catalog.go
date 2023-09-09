@@ -10,7 +10,7 @@ import (
 
 func ViewTextCatalog(s botkit.ProductsStorager) botkit.ViewFunc {
 
-	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update) error {
+	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update, botInfo botkit.BotInfo) error {
 		catalog, err := s.Catalog(ctx)
 		if err != nil {
 			log.Printf("[ERROR] Get catalog from ProductsStorage %v", err)
