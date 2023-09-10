@@ -6,11 +6,12 @@ import (
 	"tgbotv2/internal/botkit"
 )
 
-func ViewCmdStart() botkit.ViewFunc {
+func ViewCmdStart(next botkit.ViewFunc) botkit.ViewFunc {
 	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update, botInfo botkit.BotInfo) error {
-		if _, err := bot.Send(tgbotapi.NewMessage(update.FromChat().ID, "Hello@")); err != nil {
+		if _, err := bot.Send(tgbotapi.NewMessage(update.FromChat().ID, `Привет новый пользователь!`)); err != nil {
 			return err
 		}
+		next(ctx, bot, update, botInfo)
 		return nil
 	}
 }

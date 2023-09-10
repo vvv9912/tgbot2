@@ -1,16 +1,28 @@
-package bot
+package middleware
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
+	"tgbotv2/internal/bot/constant"
+
 	"tgbotv2/internal/botkit"
 	"tgbotv2/internal/model"
 )
 
+type Middleware struct {
+	UserStorage botkit.UsersStorager
+}
+
+func NewMiddleware(userStorage botkit.UsersStorager) *Middleware {
+	return &Middleware{UserStorage: userStorage}
+}
+
 // сюда кэш можно
-func MwAdminOnly(next botkit.ViewFunc) botkit.ViewFunc {
+func (m *Middleware) MwAdminOnly(next botkit.ViewFunc) botkit.ViewFunc {
 	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update, botInfo botkit.BotInfo) error {
 
 		next(ctx, bot, update, botInfo)
@@ -19,12 +31,14 @@ func MwAdminOnly(next botkit.ViewFunc) botkit.ViewFunc {
 	}
 }
 
-func MwUsersOnly(u botkit.UsersStorager, next botkit.ViewFunc) botkit.ViewFunc {
+func (m *Middleware) MwUsersOnly(next botkit.ViewFunc) botkit.ViewFunc {
 	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update, botInfo botkit.BotInfo) error {
 		//проверка на user
-		uStatus, uState, err := u.GetStatusUserByTgID(ctx, update.FromChat().ID)
+
+		uStatus, uState, err := m.UserStorage.GetStatusUserByTgID(ctx, update.FromChat().ID)
 		if err != nil {
-			if err.Error() == NoRows {
+
+			if errors.Is(err, sql.ErrNoRows) {
 				//ok
 				err = nil
 			} else {
@@ -36,25 +50,27 @@ func MwUsersOnly(u botkit.UsersStorager, next botkit.ViewFunc) botkit.ViewFunc {
 		botInfo.IdState = uState
 
 		switch uStatus {
-		case UNoUser:
-			err = u.AddUser(ctx, model.Users{
+		case constant.UNoUser:
+			err = m.UserStorage.AddUser(ctx, model.Users{
 				TgID:       botInfo.TgId,
-				StateUser:  UUser,
-				StatusUser: E_STATE_NOTHING,
+				StateUser:  constant.UUser,
+				StatusUser: constant.E_STATE_NOTHING,
 			})
 			if err != nil {
 				log.Println(err)
 				return err
 			}
-			botInfo.IdState = UUser
-			botInfo.IdStatus = E_STATE_NOTHING
+			botInfo.IdState = constant.UUser
+			botInfo.IdStatus = constant.E_STATE_NOTHING
 			//Добавить в бд и Приветствие!
-		case UAdmin:
+		case constant.UAdmin:
 			//
-		case UUser:
+		case constant.UUser:
 			//
 		}
+
 		next(ctx, bot, update, botInfo)
+
 		return nil
 	}
 }

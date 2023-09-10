@@ -43,7 +43,7 @@ type BotInfo struct {
 // addcatalog
 // listZakazov
 // deleteCatalog id
-type ViewFunc func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update, botinfo BotInfo) error
+type ViewFunc func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update, botInfo BotInfo) error
 
 func New(api *tgbotapi.BotAPI) *Bot {
 	return &Bot{api: api}
@@ -129,11 +129,12 @@ func (b *Bot) handleUpdate(ctx context.Context, update tgbotapi.Update) {
 				return
 			}
 			view = textView
+
 		}
 	}
-	var botinfo BotInfo
-	botinfo.TgId = update.FromChat().ID
-	if err := view(ctx, b.api, update, botinfo); err != nil {
+	var botInfo BotInfo
+	botInfo.TgId = update.FromChat().ID
+	if err := view(ctx, b.api, update, botInfo); err != nil {
 		log.Printf("[ERROR] failed to handle update: %v", err)
 
 		if _, err := b.api.Send(

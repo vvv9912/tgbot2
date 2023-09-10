@@ -2,12 +2,13 @@ package storage_test
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"log"
 	"testing"
-	"tgbotv2/internal/bot"
 	"tgbotv2/internal/model"
 	"tgbotv2/internal/storage"
 	"time"
@@ -98,10 +99,10 @@ func TestUsersPostgresStorage_GetStatusUserByTgID(t *testing.T) {
 	s := storage.NewUsersPostgresStorage(db)
 	ctx := context.TODO()
 	var tgid int64
-	tgid = 1
+	tgid = 14124
 	status, state, err := s.GetStatusUserByTgID(ctx, tgid)
 	if err != nil {
-		if err.Error() == bot.NoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			t.Logf("ok, status:%v, state:%v", status, state)
 			err = nil
 		} else {

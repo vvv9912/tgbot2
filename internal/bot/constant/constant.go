@@ -1,4 +1,4 @@
-package bot
+package constant
 
 var (
 	UNoUser int = 0

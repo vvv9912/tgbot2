@@ -10,9 +10,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	bot2 "tgbotv2/internal/bot"
 	bot "tgbotv2/internal/bot/callback"
 	"tgbotv2/internal/bot/cmd"
+	"tgbotv2/internal/bot/middleware"
 	"tgbotv2/internal/bot/text"
 	"tgbotv2/internal/botkit"
 	"tgbotv2/internal/config"
@@ -36,12 +36,12 @@ func main() {
 	defer cancel()
 	sUsers := storage.NewUsersPostgresStorage(db)
 	Ourbot := botkit.New(botAPI)
-
-	Ourbot.RegisterCmdView("start", cmd.ViewCmdStart())
+	mw := middleware.NewMiddleware(sUsers)
+	Ourbot.RegisterCmdView("start", mw.MwUsersOnly(cmd.ViewCmdStart(cmd.ViewCmdButton())))
 	Ourbot.RegisterCmdView("button", cmd.ViewCmdButton())
 	Ourbot.RegisterCmdView("adminbutton", cmd.ViewCmdAdminButton())
 
-	Ourbot.RegisterTextView("Каталог", bot2.MwUsersOnly(sUsers, text.ViewTextCatalog(sProducts)))
+	Ourbot.RegisterTextView("Каталог", mw.MwUsersOnly(text.ViewTextCatalog(sProducts)))
 
 	Ourbot.RegisterCallbackView("/ucatalog", bot.ViewCallbackUcatalog(sProducts))
 
