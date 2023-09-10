@@ -35,6 +35,7 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 	sUsers := storage.NewUsersPostgresStorage(db)
+	cUsers := storage.NewCorzinaPostgresStorage(db)
 	Ourbot := botkit.New(botAPI)
 	mw := middleware.NewMiddleware(sUsers)
 	Ourbot.RegisterCmdView("start", mw.MwUsersOnly(cmd.ViewCmdStart(cmd.ViewCmdButton())))
@@ -44,6 +45,7 @@ func main() {
 	Ourbot.RegisterTextView("Каталог", mw.MwUsersOnly(text.ViewTextCatalog(sProducts)))
 
 	Ourbot.RegisterCallbackView("/ucatalog", bot.ViewCallbackUcatalog(sProducts))
+	Ourbot.RegisterCallbackView("/addCorzine", bot.ViewCallbackAddcorzine(sProducts, sUsers, cUsers))
 
 	if err := Ourbot.Run(ctx); err != nil {
 		if !errors.Is(err, context.Canceled) {

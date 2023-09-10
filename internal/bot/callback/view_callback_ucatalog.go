@@ -60,8 +60,7 @@ func ViewCallbackUcatalog(s botkit.ProductsStorager) botkit.ViewFunc {
 				//sss := fmt.Sprintf("/addCorzine\narticle:%d\ncategory:%s", sProducts[i].Article, sProducts[i].Catalog) //todo
 				//Завернули структуру в структуру (джсон в джсон)
 				dataAddCorz := AddCorzine{
-					Article:  sProducts[i].Article,
-					Category: sProducts[i].Catalog,
+					Article: sProducts[i].Article,
 				}
 				msgAddCorz, err := json.Marshal(dataAddCorz)
 				if err != nil {
@@ -81,14 +80,21 @@ func ViewCallbackUcatalog(s botkit.ProductsStorager) botkit.ViewFunc {
 				)
 
 				msg.ReplyMarkup = numericKeyboardInline
-				bot.Send(msg) //todo
+				_, err = bot.Send(msg) //todo
+				if err != nil {
+					log.Println(err)
+					return err
+				}
 			} else { //если нет фото
+				//s := text
+				//text += `<a href="tg://btn/dmVyeSBsb25nIHN0cmluZwBldmVuIGxvbmdlciBzdHJpbmcAZXZlbiBsb25nZXIgc3RpbGwgc3RyaW5n">\u200b</a>My <b>message</b> text.`
+				//text = `<a href="tg://btn/dmVyeSBsb25nIHN0cmluZwBldmVuIGxvbmdlciBzdHJpbmcAZXZlsadssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssbiBsb25nZXIgc3RpbGwgc3RyaW5n">\u200b</a>` + text
 				msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, text)
+				//msg.ParseMode = "HTML"
 				//sss := fmt.Sprintf("/addCorzine\narticle:%d\ncategory:%s", sProducts[i].Article, sProducts[i].Catalog) //todo
 				//Завернули структуру в структуру (джсон в джсон)
 				dataAddCorz := AddCorzine{
-					Article:  sProducts[i].Article,
-					Category: sProducts[i].Catalog,
+					Article: sProducts[i].Article,
 				}
 				msgAddCorz, err := json.Marshal(dataAddCorz)
 				if err != nil {
@@ -98,15 +104,26 @@ func ViewCallbackUcatalog(s botkit.ProductsStorager) botkit.ViewFunc {
 					Cmd:  "/addCorzine",
 					Data: string(msgAddCorz),
 				}
+				//_ = msgAddCorz
+				//dataMsg := botkit.BotCommand{
+				//	Cmd: "/addCorzine",
+				//}
 				sss, err := json.Marshal(dataMsg)
+				podrobnee = []byte("a")
 				var numericKeyboardInline = tgbotapi.NewInlineKeyboardMarkup(
 					tgbotapi.NewInlineKeyboardRow(
 						tgbotapi.NewInlineKeyboardButtonData("Подробнее", string(podrobnee)),
 						tgbotapi.NewInlineKeyboardButtonData("Добавить в корзину", string(sss)),
 					),
 				)
+				log.Println("len(sss)=", len(sss))
 				msg.ReplyMarkup = numericKeyboardInline
-				bot.Send(msg) //todo
+				_, err = bot.Send(msg) //todo
+				if err != nil {
+					log.Println(err)
+					return err
+				}
+
 			}
 		}
 		return nil

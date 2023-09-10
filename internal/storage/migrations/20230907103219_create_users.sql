@@ -5,7 +5,6 @@ CREATE TABLE users (
     tg_id integer NOT NULL , --tg id
     status_user integer NOT NULL ,
     state_user integer NOT NULL ,
-    corzina integer[],
     CREATED_AT timestamp NOT NULL DEFAULT NOW()
 );
 

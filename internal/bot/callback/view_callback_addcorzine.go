@@ -8,7 +8,7 @@ import (
 	"tgbotv2/internal/botkit"
 )
 
-func ViewCallbackAddcorzine(s botkit.ProductsStorager) botkit.ViewFunc {
+func ViewCallbackAddcorzine(s botkit.ProductsStorager, u botkit.UsersStorager, c botkit.CorzinaStorager) botkit.ViewFunc {
 
 	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update, botInfo botkit.BotInfo) error {
 
@@ -19,13 +19,14 @@ func ViewCallbackAddcorzine(s botkit.ProductsStorager) botkit.ViewFunc {
 			return err
 		}
 		var MsgAddCorzine AddCorzine
-		err = json.Unmarshal([]byte(Data.Data), MsgAddCorzine)
+		err = json.Unmarshal([]byte(Data.Data), &MsgAddCorzine)
 		if err != nil {
 			log.Printf("[ERROR] Json преобразование callback %v", err)
 			return err
 		}
 		//Добавление в БД
-
+		//u.GetCorzinaByTgID()
+		//u.UpdateCorzinaByTgId()
 		return nil
 	}
 }

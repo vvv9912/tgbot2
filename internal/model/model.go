@@ -11,15 +11,21 @@ type Products struct {
 	Price       float32 `json:"price,omitempty"`
 }
 
-//type Products struct {
-//	Article     int
-//	Catalog     string
-//	Name        string
-//	Description string
-//	PhotoUrl    string
-//	Price       float32
-//}
-
+//	type Products struct {
+//		Article     int
+//		Catalog     string
+//		Name        string
+//		Description string
+//		PhotoUrl    string
+//		Price       float32
+//	}
+type Corzine struct {
+	ID        int       `json:"id,omitempty"`
+	TgId      int       `json:"tg_id,omitempty"`
+	Article   int       `json:"article,omitempty"` //В наличии
+	Quantity  int       `json:"quantity,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+}
 type Orders struct {
 	ID          int       `json:"id,omitempty"`
 	TgID        int       `json:"tg_id,omitempty"`
@@ -30,10 +36,10 @@ type Orders struct {
 }
 
 type Users struct {
-	id         int       `json:"id,omitempty"`
-	TgID       int64     `json:"tg_id,omitempty"`
-	StatusUser int       `json:"status_user,omitempty"`
-	StateUser  int       `json:"state_user,omitempty"`
-	Corzine    []int     `json:"corzine,omitempty"`
-	CreatedAt  time.Time `json:"created_at"`
+	id         int   `json:"id,omitempty"`
+	TgID       int64 `json:"tg_id,omitempty"`
+	StatusUser int   `json:"status_user,omitempty"`
+	StateUser  int   `json:"state_user,omitempty"`
+	//Corzine    []int     `json:"corzine,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
 }

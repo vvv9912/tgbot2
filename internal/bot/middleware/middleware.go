@@ -53,8 +53,8 @@ func (m *Middleware) MwUsersOnly(next botkit.ViewFunc) botkit.ViewFunc {
 		case constant.UNoUser:
 			err = m.UserStorage.AddUser(ctx, model.Users{
 				TgID:       botInfo.TgId,
-				StateUser:  constant.UUser,
-				StatusUser: constant.E_STATE_NOTHING,
+				StatusUser: constant.UUser,
+				StateUser:  constant.E_STATE_NOTHING,
 			})
 			if err != nil {
 				log.Println(err)

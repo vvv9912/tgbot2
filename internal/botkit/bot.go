@@ -14,6 +14,8 @@ import (
 	"time"
 )
 
+type CorzinaStorager interface {
+}
 type ProductsStorager interface {
 	Catalog(ctx context.Context) ([]string, error)
 	ProductsByCatalog(ctx context.Context, ctlg string) ([]model.Products, error)
@@ -21,6 +23,8 @@ type ProductsStorager interface {
 type UsersStorager interface {
 	GetStatusUserByTgID(ctx context.Context, tgID int64) (int, int, error)
 	AddUser(ctx context.Context, users model.Users) error
+	//GetCorzinaByTgID(ctx context.Context, tgID int64) ([]int64, error)
+	//UpdateCorzinaByTgId(ctx context.Context, tgId int64, corzina []int64) error
 }
 type BotCommand struct {
 	Cmd  string `json:"cmd,omitempty"`
