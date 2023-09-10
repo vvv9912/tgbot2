@@ -21,14 +21,14 @@ type Products struct {
 //	}
 type Corzine struct {
 	ID        int       `json:"id,omitempty"`
-	TgId      int       `json:"tg_id,omitempty"`
+	TgId      int64     `json:"tg_id,omitempty"`
 	Article   int       `json:"article,omitempty"` //В наличии
 	Quantity  int       `json:"quantity,omitempty"`
 	CreatedAt time.Time `json:"created_at"`
 }
 type Orders struct {
 	ID          int       `json:"id,omitempty"`
-	TgID        int       `json:"tg_id,omitempty"`
+	TgID        int64     `json:"tg_id,omitempty"`
 	StatusOrder int       `json:"status_order,omitempty"`
 	Pvz         string    `json:"pvz,omitempty"`
 	Order       string    `json:"order,omitempty"`

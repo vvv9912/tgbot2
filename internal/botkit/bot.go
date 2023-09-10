@@ -15,6 +15,10 @@ import (
 )
 
 type CorzinaStorager interface {
+	AddCorzinas(ctx context.Context, corz model.Corzine) error
+	CorzinaByTgId(ctx context.Context, tgId int64) ([]model.Corzine, error)
+	UpdateCorzinaByTgId(ctx context.Context, tgId int64, article int, quantity int) error
+	CorzinaByTgIdANDAtricle(ctx context.Context, tgId int64, article int) (model.Corzine, error)
 }
 type ProductsStorager interface {
 	Catalog(ctx context.Context) ([]string, error)

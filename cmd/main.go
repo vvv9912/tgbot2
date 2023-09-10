@@ -38,15 +38,20 @@ func main() {
 	cUsers := storage.NewCorzinaPostgresStorage(db)
 	Ourbot := botkit.New(botAPI)
 	mw := middleware.NewMiddleware(sUsers)
+	//
 	Ourbot.RegisterCmdView("start", mw.MwUsersOnly(cmd.ViewCmdStart(cmd.ViewCmdButton())))
 	Ourbot.RegisterCmdView("button", cmd.ViewCmdButton())
 	Ourbot.RegisterCmdView("adminbutton", cmd.ViewCmdAdminButton())
 
+	//
 	Ourbot.RegisterTextView("Каталог", mw.MwUsersOnly(text.ViewTextCatalog(sProducts)))
 
+	//
 	Ourbot.RegisterCallbackView("/ucatalog", bot.ViewCallbackUcatalog(sProducts))
-	Ourbot.RegisterCallbackView("/addCorzine", bot.ViewCallbackAddcorzine(sProducts, sUsers, cUsers))
+	Ourbot.RegisterCallbackView("/addCorzine", bot.ViewCallbackAddcorzine(cUsers))
+	Ourbot.RegisterCallbackView("/moredetailed", bot.ViewCallbackMoredetailed(cUsers))
 
+	//
 	if err := Ourbot.Run(ctx); err != nil {
 		if !errors.Is(err, context.Canceled) {
 			log.Printf("[ERROR] failed to start bot: %v", err)

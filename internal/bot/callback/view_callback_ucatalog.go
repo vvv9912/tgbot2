@@ -7,7 +7,6 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"io/ioutil"
 	"log"
-	"strconv"
 	"tgbotv2/internal/botkit"
 )
 
@@ -38,10 +37,9 @@ func ViewCallbackUcatalog(s botkit.ProductsStorager) botkit.ViewFunc {
 			//text := fmt.Sprintf("Артикул: %d\nНазвание: %s\n%s\nЦена: %0.2fрублей\n", db_send[i].Article, db_send[i].Name, db_send[i].Description, db_send[i].Price)
 			text := fmt.Sprintf("Артикул: %d\nНазвание: %s\nПодходит для: \nЦена: %0.2f рублей\n", sProducts[i].Article, sProducts[i].Name, sProducts[i].Price)
 			//podrobnee := fmt.Sprintf("/moredetailed\narticle:%d", sProducts[i].Article) //todo toJson
-			data := botkit.BotCommand{Cmd: "/moredetailed",
-				Data: strconv.Itoa(sProducts[i].Article)}
+
 			//data = fmt.Sprintf("/ucatalog\ncategory:%s", catalog[i]) //надо передавать команду +id что удалить(?) //todo передать сразу json
-			podrobnee, err := json.Marshal(data)
+
 			if err != nil {
 				log.Println("") //todo
 			}
@@ -59,6 +57,7 @@ func ViewCallbackUcatalog(s botkit.ProductsStorager) botkit.ViewFunc {
 
 				//sss := fmt.Sprintf("/addCorzine\narticle:%d\ncategory:%s", sProducts[i].Article, sProducts[i].Catalog) //todo
 				//Завернули структуру в структуру (джсон в джсон)
+
 				dataAddCorz := AddCorzine{
 					Article: sProducts[i].Article,
 				}
@@ -66,6 +65,9 @@ func ViewCallbackUcatalog(s botkit.ProductsStorager) botkit.ViewFunc {
 				if err != nil {
 					log.Println("") //todo
 				}
+				data := botkit.BotCommand{Cmd: "/moredetailed",
+					Data: string(msgAddCorz)}
+				podrobnee, err := json.Marshal(data)
 				dataMsg := botkit.BotCommand{
 					Cmd:  "/addCorzine",
 					Data: string(msgAddCorz),
@@ -86,10 +88,8 @@ func ViewCallbackUcatalog(s botkit.ProductsStorager) botkit.ViewFunc {
 					return err
 				}
 			} else { //если нет фото
-				//s := text
-				//text += `<a href="tg://btn/dmVyeSBsb25nIHN0cmluZwBldmVuIGxvbmdlciBzdHJpbmcAZXZlbiBsb25nZXIgc3RpbGwgc3RyaW5n">\u200b</a>My <b>message</b> text.`
-				//text = `<a href="tg://btn/dmVyeSBsb25nIHN0cmluZwBldmVuIGxvbmdlciBzdHJpbmcAZXZlsadssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssbiBsb25nZXIgc3RpbGwgc3RyaW5n">\u200b</a>` + text
 				msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, text)
+				//text = `<a href="tg://btn/dmVyeSBsb25nIHN0cmluZwBldmVuIGxvbmdlciBzdHJpbmcAZXZlsadssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssbiBsb25nZXIgc3RpbGwgc3RyaW5n">\u200b</a>` + text
 				//msg.ParseMode = "HTML"
 				//sss := fmt.Sprintf("/addCorzine\narticle:%d\ncategory:%s", sProducts[i].Article, sProducts[i].Catalog) //todo
 				//Завернули структуру в структуру (джсон в джсон)
@@ -104,12 +104,15 @@ func ViewCallbackUcatalog(s botkit.ProductsStorager) botkit.ViewFunc {
 					Cmd:  "/addCorzine",
 					Data: string(msgAddCorz),
 				}
+				data := botkit.BotCommand{Cmd: "/moredetailed",
+					Data: string(msgAddCorz)}
+				podrobnee, err := json.Marshal(data)
 				//_ = msgAddCorz
 				//dataMsg := botkit.BotCommand{
 				//	Cmd: "/addCorzine",
 				//}
 				sss, err := json.Marshal(dataMsg)
-				podrobnee = []byte("a")
+
 				var numericKeyboardInline = tgbotapi.NewInlineKeyboardMarkup(
 					tgbotapi.NewInlineKeyboardRow(
 						tgbotapi.NewInlineKeyboardButtonData("Подробнее", string(podrobnee)),

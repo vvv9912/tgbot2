@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func ViewCallbackAddcorzine(c botkit.CorzinaStorager) botkit.ViewFunc {
+func ViewCallbackMoredetailed(c botkit.CorzinaStorager) botkit.ViewFunc {
 
 	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update, botInfo botkit.BotInfo) error {
 
