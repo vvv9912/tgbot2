@@ -8,7 +8,11 @@ type Products struct {
 	Name        string  `json:"name,omitempty"`
 	Description string  `json:"description,omitempty"`
 	PhotoUrl    string  `json:"photo_url,omitempty"`
-	Price       float32 `json:"price,omitempty"`
+	Price       float64 `json:"price,omitempty"`
+	Length      int     `json:"length"`
+	Width       int     `json:"width"`
+	Height      int     `json:"height"`
+	Weight      int     `json:"weight"`
 }
 
 //	type Products struct {

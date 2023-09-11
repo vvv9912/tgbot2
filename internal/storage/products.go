@@ -61,5 +61,9 @@ type dbProduct struct {
 	Name        string  `db:"a_name"`
 	Description string  `db:"a_description"`
 	PhotoUrl    string  `db:"a_photo_url"`
-	Price       float32 `db:"a_price"`
+	Price       float64 `db:"a_price"`
+	Length      int     `db:"a_length"`
+	Width       int     `db:"a_width"`
+	Height      int     `db:"a_height"`
+	Weight      int     `db:"a_weight"`
 }

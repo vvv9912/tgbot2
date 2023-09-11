@@ -20,7 +20,10 @@ import (
 )
 
 func main() {
+	//	rr := exel.Read()
+
 	botAPI, err := tgbotapi.NewBotAPI(config.Get().TelegramBotToken)
+	_ = rr
 	if err != nil {
 		log.Printf("failed to create bot:%v", err)
 		return
