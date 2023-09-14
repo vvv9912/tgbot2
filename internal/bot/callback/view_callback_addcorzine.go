@@ -30,6 +30,7 @@ func ViewCallbackAddcorzine(c botkit.CorzinaStorager) botkit.ViewFunc {
 			return err
 		}
 		//Добавление в БД
+
 		corz, err := c.CorzinaByTgIdANDAtricle(ctx, botInfo.TgId, MsgAddCorzine.Article)
 		_ = corz
 

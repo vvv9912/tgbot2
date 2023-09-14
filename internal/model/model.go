@@ -1,13 +1,15 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type Products struct {
 	Article     int     `json:"article,omitempty"`
 	Catalog     string  `json:"catalog,omitempty"`
 	Name        string  `json:"name,omitempty"`
 	Description string  `json:"description,omitempty"`
-	PhotoUrl    string  `json:"photo_url,omitempty"`
+	PhotoUrl    []byte  `json:"photo_url,omitempty"`
 	Price       float64 `json:"price,omitempty"`
 	Length      int     `json:"length"`
 	Width       int     `json:"width"`

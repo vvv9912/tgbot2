@@ -112,3 +112,37 @@ type dbCorzine struct {
 	Quantity  int       `db:"c_quantity"`
 	CreatedAt time.Time `db:"c_created_at"`
 }
+
+func (s *CorzinaPostgresStorage) CorzinaByTgIdwithCalalog(ctx context.Context, tgId int64) ([]DbCorzineCatalog, error) {
+	conn, err := s.db.Connx(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	//var products []model.Products
+	var corzineall []DbCorzineCatalog
+	if err := conn.SelectContext(ctx,
+		&corzineall,
+		`SELECT corzina.id AS c_id, 
+       		   corzina.tg_id AS c_tg_id,
+       		   p.article AS c_article,
+       		   corzina.quantity AS c_quantity,
+       		   p.catalog AS c_catalog,
+       		   p.name AS c_name
+			   FROM  corzina
+			   LEFT JOIN public.products p on corzina.article = p.article  where tg_id = $1 GROUP BY id, p.article;`,
+		tgId); err != nil {
+		return nil, err
+	}
+
+	return corzineall, nil
+}
+
+type DbCorzineCatalog struct {
+	ID       int    `db:"c_id"`
+	TgId     int64  `db:"c_tg_id"`
+	Article  int    `db:"c_article"` //В наличии
+	Quantity int    `db:"c_quantity"`
+	Catalog  string `db:"c_catalog,"`
+	Name     string `db:"c_name"`
+}

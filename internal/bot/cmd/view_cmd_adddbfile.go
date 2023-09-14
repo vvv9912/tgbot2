@@ -2,19 +2,24 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/mholt/archiver"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
+	"strings"
 	"tgbotv2/internal/botkit"
 	"tgbotv2/internal/config"
+	"tgbotv2/internal/exel"
+	"tgbotv2/internal/model"
 )
 
 // Скачивание файла
-func ViewCmdAdddbfile() botkit.ViewFunc {
+func ViewCmdAdddbfile(p botkit.ProductsStorager) botkit.ViewFunc {
 
 	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update, botInfo botkit.BotInfo) error {
 		//Проверка типа, что это rar
@@ -79,7 +84,61 @@ func ViewCmdAdddbfile() botkit.ViewFunc {
 			fmt.Println(err)
 			return err
 		}
-
+		//База данных.xlsx
+		//"./tmp_downl/test_bd/База данных.xlsx"
+		pathfiledb := path.Join("tmp_downl", "test_bd", "База данных.xlsx") //после архивации
+		pathdir := path.Join("tmp_downl", "test_bd")
+		ex := exel.NewExcel(pathfiledb)
+		indb := ex.Read()
+		if indb == nil {
+			return errors.New("pars file db")
+		}
+		for i := range *indb {
+			var photoBytes []byte
+			if (*indb)[i].PhotoUrl != "" {
+				//ппроверка неправильного пути
+				if strings.Contains((*indb)[i].PhotoUrl, fmt.Sprintf(`\`)) {
+					a := strings.Split((*indb)[i].PhotoUrl, `\`)
+					var photoUrl string
+					for i := range a {
+						photoUrl = path.Join(photoUrl, a[i])
+					}
+					photoBytes, err = ioutil.ReadFile(path.Join(pathdir, photoUrl))
+					if err != nil {
+						return err
+					}
+				} else {
+					//f, err := os.Open(path.Join(pathdir, (*indb)[i].PhotoUrl))
+					//img, _, err := image.Decode(f)
+					//jpeg.Decode(f)
+					//var photoBytes []byte
+					//
+					//k, err := f.Read(photoBytes)
+					//fmt.Println(k)
+					//fmt.Println(err)
+					photoBytes, err = ioutil.ReadFile(path.Join(pathdir, (*indb)[i].PhotoUrl))
+					if err != nil {
+						return err
+					}
+				}
+				fmt.Println("длина:", len(photoBytes))
+			}
+			err = p.AddProduct(ctx, model.Products{
+				Article:     (*indb)[i].Article,
+				Catalog:     (*indb)[i].Catalog,
+				Name:        (*indb)[i].Name,
+				Description: (*indb)[i].Description,
+				PhotoUrl:    photoBytes,
+				Price:       (*indb)[i].Price,
+				Length:      (*indb)[i].Length,
+				Width:       (*indb)[i].Width,
+				Height:      (*indb)[i].Height,
+				Weight:      (*indb)[i].Weight,
+			})
+			if err != nil {
+				return err
+			}
+		}
 		// сюда протащить загрузку в бд!
 		return nil
 	}

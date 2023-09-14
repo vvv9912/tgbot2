@@ -14,6 +14,35 @@ type ProductsPostgresStorage struct {
 func NewProductsPostgresStorage(db *sqlx.DB) *ProductsPostgresStorage {
 	return &ProductsPostgresStorage{db: db}
 }
+func (s *ProductsPostgresStorage) AddProduct(ctx context.Context, product model.Products) error {
+	conn, err := s.db.Connx(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	if _, err := conn.ExecContext(
+		ctx,
+		`INSERT INTO products (article, catalog, name, description, photo_url, price, length, width, heigth, weight)
+	    				VALUES ($1, $2, $3,$4, $5, $6,$7, $8, $9, $10)
+	    				ON CONFLICT DO NOTHING;`,
+		product.Article,
+		product.Catalog,
+		product.Name,
+		product.Description,
+		product.PhotoUrl,
+		product.Price,
+		product.Length,
+		product.Width,
+		product.Height,
+		product.Weight,
+		//users.CreatedAt,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func (s *ProductsPostgresStorage) Catalog(ctx context.Context) ([]string, error) {
 
@@ -72,7 +101,7 @@ func (s *ProductsPostgresStorage) ProductByArticle(ctx context.Context, article 
      			price AS c_price,
      			length AS c_length,
      			width AS c_width,
-     			height AS c_height,
+     			heigth AS c_height,
      			weight AS c_weight,
 	 			FROM products
 	 			WHERE (article = $1)`,
@@ -91,6 +120,7 @@ func (s *ProductsPostgresStorage) ProductByArticle(ctx context.Context, article 
 	if err != nil {
 		return model.Products{}, err
 	}
+
 	return model.Products{
 		Article:     products.Article,
 		Catalog:     products.Catalog,
@@ -110,7 +140,7 @@ type dbProduct struct {
 	Catalog     string  `db:"a_catalog"`
 	Name        string  `db:"a_name"`
 	Description string  `db:"a_description"`
-	PhotoUrl    string  `db:"a_photo_url"`
+	PhotoUrl    []byte  `db:"a_photo_url"`
 	Price       float64 `db:"a_price"`
 	Length      int     `db:"a_length"`
 	Width       int     `db:"a_width"`

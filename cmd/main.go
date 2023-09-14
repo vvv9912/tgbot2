@@ -21,6 +21,7 @@ import (
 )
 
 func main() {
+
 	//rr := exel.Read()
 	botAPI, err := tgbotapi.NewBotAPI(config.Get().TelegramBotToken)
 	//_ = rr
@@ -45,11 +46,11 @@ func main() {
 	Ourbot.RegisterCmdView("start", mw.MwUsersOnly(cmd.ViewCmdStart(cmd.ViewCmdButton())))
 	Ourbot.RegisterCmdView("button", cmd.ViewCmdButton())
 	Ourbot.RegisterCmdView("adminbutton", cmd.ViewCmdAdminButton())
-	Ourbot.RegisterCmdView("database", cmd.ViewCmdAddDatabase()) //Проверка что админ
-	Ourbot.RegisterCmdView("/adddbfile", cmd.ViewCmdAdddbfile()) // Проверка что админ
+	Ourbot.RegisterCmdView("database", cmd.ViewCmdAddDatabase())          //Проверка что админ
+	Ourbot.RegisterCmdView("/adddbfile", cmd.ViewCmdAdddbfile(sProducts)) // Проверка что админ
 	//
 	Ourbot.RegisterTextView("Каталог", mw.MwUsersOnly(text.ViewTextCatalog(sProducts)))
-
+	Ourbot.RegisterTextView("Корзина", mw.MwUsersOnly(text.ViewTextCorzine(sCorzina)))
 	//
 	Ourbot.RegisterCallbackView("/ucatalog", bot.ViewCallbackUcatalog(sProducts))
 	Ourbot.RegisterCallbackView("/addCorzine", bot.ViewCallbackAddcorzine(sCorzina))

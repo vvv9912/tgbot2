@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"io/ioutil"
 	"log"
 	"tgbotv2/internal/botkit"
 )
@@ -44,12 +43,14 @@ func ViewCallbackUcatalog(s botkit.ProductsStorager) botkit.ViewFunc {
 				log.Println("") //todo
 			}
 
-			if sProducts[i].PhotoUrl != "" {
-				photoBytes, err := ioutil.ReadFile(sProducts[i].PhotoUrl)
-				_ = err
+			if len(sProducts[i].PhotoUrl) != 0 {
+
+				//photoBytes, err := ioutil.ReadFile(sProducts[i].PhotoUrl)
+				//photoBytes, err := ioutil.ReadFile("")
+				//_ = err
 				photoFileBytes := tgbotapi.FileBytes{
 					Name:  "photo",
-					Bytes: photoBytes,
+					Bytes: sProducts[i].PhotoUrl,
 				}
 
 				msg := tgbotapi.NewPhoto(update.CallbackQuery.From.ID, nil)

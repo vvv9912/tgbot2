@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"tgbotv2/internal/model"
+	"tgbotv2/internal/storage"
 )
 
 //логика работы с ботом
@@ -19,11 +20,13 @@ type CorzinaStorager interface {
 	CorzinaByTgId(ctx context.Context, tgId int64) ([]model.Corzine, error)
 	UpdateCorzinaByTgId(ctx context.Context, tgId int64, article int, quantity int) error
 	CorzinaByTgIdANDAtricle(ctx context.Context, tgId int64, article int) (model.Corzine, error)
+	CorzinaByTgIdwithCalalog(ctx context.Context, tgId int64) ([]storage.DbCorzineCatalog, error)
 }
 type ProductsStorager interface {
 	Catalog(ctx context.Context) ([]string, error)
 	ProductsByCatalog(ctx context.Context, ctlg string) ([]model.Products, error)
 	ProductByArticle(ctx context.Context, article int) (model.Products, error)
+	AddProduct(ctx context.Context, product model.Products) error
 }
 type UsersStorager interface {
 	GetStatusUserByTgID(ctx context.Context, tgID int64) (int, int, error)
