@@ -54,6 +54,7 @@ func ViewCmdAdddbfile() botkit.ViewFunc {
 		}
 		FileName := path.Join("tmp_downl", "db.zip")
 		//	FileName := "tmp_downl/db.RAR"
+
 		out, err := os.Create(FileName)
 		defer out.Close()
 		_, err = io.Copy(out, resp.Body)
