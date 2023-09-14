@@ -8,8 +8,18 @@ import (
 )
 
 // todo
-func Read() []model.Products {
-	f, err := excelize.OpenFile("База данных.xlsx")
+type Excel struct {
+	nameFile string
+}
+
+func NewExcel(nameFile string) *Excel {
+	return &Excel{nameFile: nameFile}
+}
+
+func (e *Excel) Read() []model.Products {
+	//f, err := excelize.OpenFile("test_bd/База данных.xlsx")
+	f, err := excelize.OpenFile(e.nameFile)
+
 	if err != nil {
 		fmt.Println(err)
 		return []model.Products{}
@@ -68,7 +78,9 @@ func Read() []model.Products {
 			fmt.Println("strconv  Atoi stroka %v, err: %v", i, err)
 			return []model.Products{}
 		}
-
+		if len(rows[i]) > 9 {
+			products[i-1].PhotoUrl = rows[i][9]
+		}
 	}
 	//for _, row := range rows {
 	//	for _, colCell := range row {

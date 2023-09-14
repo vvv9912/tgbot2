@@ -11,6 +11,7 @@ import (
 	"os/signal"
 	"syscall"
 	bot "tgbotv2/internal/bot/callback"
+	callback "tgbotv2/internal/bot/callback/adddb"
 	"tgbotv2/internal/bot/cmd"
 	"tgbotv2/internal/bot/middleware"
 	"tgbotv2/internal/bot/text"
@@ -20,10 +21,9 @@ import (
 )
 
 func main() {
-	//	rr := exel.Read()
-
+	//rr := exel.Read()
 	botAPI, err := tgbotapi.NewBotAPI(config.Get().TelegramBotToken)
-	_ = rr
+	//_ = rr
 	if err != nil {
 		log.Printf("failed to create bot:%v", err)
 		return
@@ -38,22 +38,23 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 	sUsers := storage.NewUsersPostgresStorage(db)
-	cUsers := storage.NewCorzinaPostgresStorage(db)
+	sCorzina := storage.NewCorzinaPostgresStorage(db)
 	Ourbot := botkit.New(botAPI)
 	mw := middleware.NewMiddleware(sUsers)
 	//
 	Ourbot.RegisterCmdView("start", mw.MwUsersOnly(cmd.ViewCmdStart(cmd.ViewCmdButton())))
 	Ourbot.RegisterCmdView("button", cmd.ViewCmdButton())
 	Ourbot.RegisterCmdView("adminbutton", cmd.ViewCmdAdminButton())
-
+	Ourbot.RegisterCmdView("database", cmd.ViewCmdAddDatabase()) //Проверка что админ
+	Ourbot.RegisterCmdView("/adddbfile", cmd.ViewCmdAdddbfile()) // Проверка что админ
 	//
 	Ourbot.RegisterTextView("Каталог", mw.MwUsersOnly(text.ViewTextCatalog(sProducts)))
 
 	//
 	Ourbot.RegisterCallbackView("/ucatalog", bot.ViewCallbackUcatalog(sProducts))
-	Ourbot.RegisterCallbackView("/addCorzine", bot.ViewCallbackAddcorzine(cUsers))
-	Ourbot.RegisterCallbackView("/moredetailed", bot.ViewCallbackMoredetailed(cUsers))
-
+	Ourbot.RegisterCallbackView("/addCorzine", bot.ViewCallbackAddcorzine(sCorzina))
+	Ourbot.RegisterCallbackView("/moredetailed", bot.ViewCallbackMoredetailed(sProducts, sCorzina))
+	Ourbot.RegisterCallbackView("/adddatabase", callback.ViewCallbackAdddatabase(sUsers)) //проверка что админ
 	//
 	if err := Ourbot.Run(ctx); err != nil {
 		if !errors.Is(err, context.Canceled) {

@@ -2,18 +2,16 @@ package callback
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
+	"strconv"
 	"tgbotv2/internal/botkit"
 	"tgbotv2/internal/model"
-	"time"
 )
 
-func ViewCallbackMoredetailed(c botkit.CorzinaStorager) botkit.ViewFunc {
+func ViewCallbackMoredetailed(p botkit.ProductsStorager, c botkit.CorzinaStorager) botkit.ViewFunc {
 
 	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update, botInfo botkit.BotInfo) error {
 
@@ -23,93 +21,73 @@ func ViewCallbackMoredetailed(c botkit.CorzinaStorager) botkit.ViewFunc {
 			log.Printf("[ERROR] Json преобразование callback %v", err)
 			return err
 		}
-		var MsgAddCorzine AddCorzine
-		err = json.Unmarshal([]byte(Data.Data), &MsgAddCorzine)
+		article, err := strconv.Atoi(Data.Data)
 		if err != nil {
-			log.Printf("[ERROR] Json преобразование callback %v", err)
+			log.Println("[ERROR] Strconv in MoreDetailed %v", err)
 			return err
 		}
-		//Добавление в БД
-		corz, err := c.CorzinaByTgIdANDAtricle(ctx, botInfo.TgId, MsgAddCorzine.Article)
-		_ = corz
+		product, err := p.ProductByArticle(ctx, article)
+		//Обновлять предыдущее сообщение (добавлять подробности)
+		if (product == model.Products{}) {
+			return err //todo
+		}
+		if product.PhotoUrl != "" {
 
-		if err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				err = nil
-				err = c.AddCorzinas(ctx, model.Corzine{
-					TgId:      botInfo.TgId,
-					Article:   MsgAddCorzine.Article,
-					Quantity:  1,
-					CreatedAt: time.Time{},
-				})
-				if err != nil {
-					log.Println(err)
-					return err
-				}
-				//send message 'add corzine' todo
-				msg := tgbotapi.NewMessage(botInfo.TgId, "Добавлено в корзину!")
-				_, err = bot.Send(msg)
-				if err != nil {
-					fmt.Println(err)
-					return err
-				}
-				answ := tgbotapi.CallbackConfig{CallbackQueryID: update.CallbackQuery.ID, Text: "Добавлено в корзину!"}
-				_, err = bot.Send(answ)
-				if err != nil {
-					fmt.Println(err)
-					return err
-				}
-				return nil
+			text := fmt.Sprintf("Артикул: %d\nНазвание: %s\n%s\nЦена: %0.2fрублей\n", product.Article, product.Name, product.Description, product.Price)
+			ms1 := tgbotapi.NewEditMessageCaption(botInfo.TgId, update.CallbackQuery.Message.MessageID, text)
+			dataAddCorz := AddCorzine{
+				Article: product.Article,
 			}
-			log.Fatalln(err)
-			return err
-		}
-		if corz == (model.Corzine{}) { //Проверка на всякий случай
-			err = c.AddCorzinas(ctx, model.Corzine{
-				TgId:      botInfo.TgId,
-				Article:   MsgAddCorzine.Article,
-				Quantity:  1,
-				CreatedAt: time.Now().UTC().Add(3 * time.Hour),
-			})
+			msgAddCorz, err := json.Marshal(dataAddCorz)
 			if err != nil {
-				log.Println(err)
+				log.Println("") //todo
+			}
+			dataMsg := botkit.BotCommand{
+				Cmd:  "/addCorzine",
+				Data: string(msgAddCorz),
+			}
+			sss, err := json.Marshal(dataMsg)
+			var numericKeyboardInline = tgbotapi.NewInlineKeyboardMarkup(
+				tgbotapi.NewInlineKeyboardRow(
+					tgbotapi.NewInlineKeyboardButtonData("Добавить в корзину", string(sss)),
+				),
+			)
+			ms1.ReplyMarkup = &numericKeyboardInline
+			_, err = bot.Send(ms1)
+			if err != nil {
+				log.Println("[ERROR] Send bot: %v", err) //todo
 				return err
 			}
-			msg := tgbotapi.NewMessage(botInfo.TgId, "Добавлено в корзину!")
-			_, err = bot.Send(msg)
+		} else {
+			text := fmt.Sprintf("Артикул: %d\nНазвание: %s\n%s\nЦена: %0.2fрублей\n", product.Article, product.Name, product.Description, product.Price)
+			ms1 := tgbotapi.NewEditMessageText(botInfo.TgId, update.CallbackQuery.Message.MessageID, text)
+			//	ms1 := tgbotapi.NewEditMessageText(int64(tg_id), update.CallbackQuery.Message.MessageID, text)
+			dataAddCorz := AddCorzine{
+				Article: product.Article,
+			}
+			msgAddCorz, err := json.Marshal(dataAddCorz)
 			if err != nil {
-				fmt.Println(err)
+				log.Println("") //todo
 				return err
 			}
-			answ := tgbotapi.CallbackConfig{CallbackQueryID: update.CallbackQuery.ID, Text: "Добавлено в корзину!"}
-			_, err = bot.Send(answ)
+			dataMsg := botkit.BotCommand{
+				Cmd:  "/addCorzine",
+				Data: string(msgAddCorz),
+			}
+			sss, err := json.Marshal(dataMsg)
+			var numericKeyboardInline = tgbotapi.NewInlineKeyboardMarkup(
+				tgbotapi.NewInlineKeyboardRow(
+					tgbotapi.NewInlineKeyboardButtonData("Добавить в корзину", string(sss)),
+				),
+			)
+			ms1.ReplyMarkup = &numericKeyboardInline
+			_, err = bot.Send(ms1)
 			if err != nil {
-				fmt.Println(err)
+				log.Println("[ERROR] Send bot: %v", err) //todo
 				return err
 			}
-			//send message 'add corzine' todo
-			return nil
 		}
-		corz.Quantity++
-		corz.CreatedAt = time.Now().UTC().Add(3 * time.Hour)
-		err = c.UpdateCorzinaByTgId(ctx, botInfo.TgId, corz.Article, corz.Quantity) //todo обновлять время
-		if err != nil {
-			log.Println(err)
-			return err
-		}
-		msg := tgbotapi.NewMessage(botInfo.TgId, "Добавлено в корзину!")
-		_, err = bot.Send(msg)
-		if err != nil {
-			fmt.Println(err)
-			return err
-		}
-		answ := tgbotapi.CallbackConfig{CallbackQueryID: update.CallbackQuery.ID, Text: "Добавлено в корзину!"}
-		_, err = bot.Send(answ)
-		if err != nil {
-			fmt.Println(err)
-			return err
-		}
-		//send message 'add corzine' todo
+
 		return nil
 	}
 }

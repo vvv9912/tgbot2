@@ -54,6 +54,56 @@ func (s *ProductsPostgresStorage) ProductsByCatalog(ctx context.Context, ctlg st
 
 	return lo.Map(products, func(product dbProduct, _ int) model.Products { return model.Products(product) }), nil
 }
+func (s *ProductsPostgresStorage) ProductByArticle(ctx context.Context, article int) (model.Products, error) {
+	conn, err := s.db.Connx(ctx)
+	if err != nil {
+		return model.Products{}, err
+	}
+	defer conn.Close()
+	//var products []model.Products
+	var products dbProduct
+	row := conn.QueryRowContext(ctx,
+		`SELECT
+     			article AS c_article,
+     			catalog AS c_catalog,
+     			name AS c_name,
+     			description AS c_description,
+     			photo_url AS c_photo_url,
+     			price AS c_price,
+     			length AS c_length,
+     			width AS c_width,
+     			height AS c_height,
+     			weight AS c_weight,
+	 			FROM products
+	 			WHERE (article = $1)`,
+		article)
+	err = row.Scan(
+		products.Article,
+		products.Catalog,
+		products.Name,
+		products.Description,
+		products.PhotoUrl,
+		products.Price,
+		products.Length,
+		products.Width,
+		products.Height,
+		products.Weight)
+	if err != nil {
+		return model.Products{}, err
+	}
+	return model.Products{
+		Article:     products.Article,
+		Catalog:     products.Catalog,
+		Name:        products.Name,
+		Description: products.Description,
+		PhotoUrl:    products.PhotoUrl,
+		Price:       products.Price,
+		Length:      products.Length,
+		Width:       products.Width,
+		Height:      products.Height,
+		Weight:      products.Weight,
+	}, err
+}
 
 type dbProduct struct {
 	Article     int     `db:"a_article"`

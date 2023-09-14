@@ -6,7 +6,11 @@ CREATE TABLE products (
     name text,
     description text, --varchar(255)
     photo_url text NOT NULL default '',
-    price FLOAT
+    price FLOAT,
+    length integer,
+    width integer,
+    heigth integer,
+    weight integer
 );
 
 -- +goose StatementEnd

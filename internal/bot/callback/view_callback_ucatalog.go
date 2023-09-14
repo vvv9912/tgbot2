@@ -73,6 +73,9 @@ func ViewCallbackUcatalog(s botkit.ProductsStorager) botkit.ViewFunc {
 					Data: string(msgAddCorz),
 				}
 				sss, err := json.Marshal(dataMsg)
+				if err != nil {
+					log.Println("") //todo
+				}
 				msg.Caption = text
 				var numericKeyboardInline = tgbotapi.NewInlineKeyboardMarkup(
 					tgbotapi.NewInlineKeyboardRow(

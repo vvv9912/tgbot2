@@ -61,6 +61,22 @@ func (s *UsersPostgresStorage) GetStatusUserByTgID(ctx context.Context, tgID int
 
 	return status, state, nil
 }
+func (s *UsersPostgresStorage) UpdateStateByTgID(ctx context.Context, tgId int64, state int) error {
+	conn, err := s.db.Connx(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	if _, err := conn.ExecContext(
+		ctx,
+		`UPDATE users SET state_user = $1 WHERE (tg_id = $2)`,
+		state,
+		tgId,
+	); err != nil {
+		return err
+	}
+	return nil
+}
 
 //func (s *UsersPostgresStorage) UpdateCorzinaByTgId(ctx context.Context, tgId int64, corzina []int64) error {
 //	conn, err := s.db.Connx(ctx)

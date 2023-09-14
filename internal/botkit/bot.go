@@ -23,10 +23,12 @@ type CorzinaStorager interface {
 type ProductsStorager interface {
 	Catalog(ctx context.Context) ([]string, error)
 	ProductsByCatalog(ctx context.Context, ctlg string) ([]model.Products, error)
+	ProductByArticle(ctx context.Context, article int) (model.Products, error)
 }
 type UsersStorager interface {
 	GetStatusUserByTgID(ctx context.Context, tgID int64) (int, int, error)
 	AddUser(ctx context.Context, users model.Users) error
+	UpdateStateByTgID(ctx context.Context, tgId int64, state int) error
 	//GetCorzinaByTgID(ctx context.Context, tgID int64) ([]int64, error)
 	//UpdateCorzinaByTgId(ctx context.Context, tgId int64, corzina []int64) error
 }
@@ -126,6 +128,15 @@ func (b *Bot) handleUpdate(ctx context.Context, update tgbotapi.Update) {
 
 			view = cmdView
 
+		} else if update.Message.Document != nil {
+
+			cmd := update.Message.Caption
+			cmdView, ok := b.cmdViews[cmd]
+			if !ok {
+				return
+			}
+
+			view = cmdView
 		} else {
 			//Если текстовая команда
 			text := update.Message.Text

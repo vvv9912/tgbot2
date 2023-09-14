@@ -6,7 +6,8 @@ CREATE TABLE orders (
     status_order integer,
     pvz jsonb,
     orderr text,
-    CREATED_AT timestamp NOT NULL DEFAULT NOW() at time zone 'utc'
+    CREATED_AT timestamp NOT NULL DEFAULT (NOW() at time zone 'UTC'),
+    READ_AT timestamp NOT NULL DEFAULT (NOW() at time zone 'UTC')
 );
 -- +goose StatementEnd
 
