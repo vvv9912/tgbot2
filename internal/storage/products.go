@@ -102,21 +102,21 @@ func (s *ProductsPostgresStorage) ProductByArticle(ctx context.Context, article 
      			length AS c_length,
      			width AS c_width,
      			heigth AS c_height,
-     			weight AS c_weight,
+     			weight AS c_weight
 	 			FROM products
 	 			WHERE (article = $1)`,
 		article)
 	err = row.Scan(
-		products.Article,
-		products.Catalog,
-		products.Name,
-		products.Description,
-		products.PhotoUrl,
-		products.Price,
-		products.Length,
-		products.Width,
-		products.Height,
-		products.Weight)
+		&products.Article,
+		&products.Catalog,
+		&products.Name,
+		&products.Description,
+		&products.PhotoUrl,
+		&products.Price,
+		&products.Length,
+		&products.Width,
+		&products.Height,
+		&products.Weight)
 	if err != nil {
 		return model.Products{}, err
 	}

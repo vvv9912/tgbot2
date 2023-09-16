@@ -15,12 +15,17 @@ import (
 	"time"
 )
 
+type OrderStorager interface {
+	AddOrders(ctx context.Context, order model.Orders) error
+}
 type CorzinaStorager interface {
 	AddCorzinas(ctx context.Context, corz model.Corzine) error
 	CorzinaByTgId(ctx context.Context, tgId int64) ([]model.Corzine, error)
 	UpdateCorzinaByTgId(ctx context.Context, tgId int64, article int, quantity int) error
 	CorzinaByTgIdANDAtricle(ctx context.Context, tgId int64, article int) (model.Corzine, error)
 	CorzinaByTgIdwithCalalog(ctx context.Context, tgId int64) ([]storage.DbCorzineCatalog, error)
+	DeleteCorzinaByTgID(ctx context.Context, tgId int64) error
+	DeleteCorzinaByTgIDandArticle(ctx context.Context, tgId int64, article int) error
 }
 type ProductsStorager interface {
 	Catalog(ctx context.Context) ([]string, error)
@@ -172,12 +177,12 @@ func (b *Bot) Run(ctx context.Context) error {
 	u.Timeout = 60
 
 	updates := b.api.GetUpdatesChan(u)
-
+	//https://yandex.ru/search/?text=webhook+telegram+bot+api+golang&lr=213&clid=2574587&win=575 webhook
 	for {
 		select {
 		case update := <-updates:
 			go func(update tgbotapi.Update) {
-				updateCtx, updateCancel := context.WithTimeout(ctx, 30*time.Second)
+				updateCtx, updateCancel := context.WithTimeout(ctx, 60*time.Second)
 				b.handleUpdate(updateCtx, update)
 				//select c таймаутом. То что запрос долго обрабатывается
 				updateCancel()

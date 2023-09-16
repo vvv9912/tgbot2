@@ -108,20 +108,11 @@ func ViewCmdAdddbfile(p botkit.ProductsStorager) botkit.ViewFunc {
 						return err
 					}
 				} else {
-					//f, err := os.Open(path.Join(pathdir, (*indb)[i].PhotoUrl))
-					//img, _, err := image.Decode(f)
-					//jpeg.Decode(f)
-					//var photoBytes []byte
-					//
-					//k, err := f.Read(photoBytes)
-					//fmt.Println(k)
-					//fmt.Println(err)
 					photoBytes, err = ioutil.ReadFile(path.Join(pathdir, (*indb)[i].PhotoUrl))
 					if err != nil {
 						return err
 					}
 				}
-				fmt.Println("длина:", len(photoBytes))
 			}
 			err = p.AddProduct(ctx, model.Products{
 				Article:     (*indb)[i].Article,
@@ -139,7 +130,8 @@ func ViewCmdAdddbfile(p botkit.ProductsStorager) botkit.ViewFunc {
 				return err
 			}
 		}
-		// сюда протащить загрузку в бд!
+		// 1. проверка на существование такого артикула
+		//
 		return nil
 	}
 }

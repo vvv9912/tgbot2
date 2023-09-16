@@ -40,6 +40,7 @@ func main() {
 	defer cancel()
 	sUsers := storage.NewUsersPostgresStorage(db)
 	sCorzina := storage.NewCorzinaPostgresStorage(db)
+	sOrder := storage.NewOrdersPostgresStorage(db)
 	Ourbot := botkit.New(botAPI)
 	mw := middleware.NewMiddleware(sUsers)
 	//
@@ -56,6 +57,10 @@ func main() {
 	Ourbot.RegisterCallbackView("/addCorzine", bot.ViewCallbackAddcorzine(sCorzina))
 	Ourbot.RegisterCallbackView("/moredetailed", bot.ViewCallbackMoredetailed(sProducts, sCorzina))
 	Ourbot.RegisterCallbackView("/adddatabase", callback.ViewCallbackAdddatabase(sUsers)) //проверка что админ
+	Ourbot.RegisterCallbackView("/deleteshoppcart", bot.ViewCallbackdeleteshoppcart(sCorzina))
+	Ourbot.RegisterCallbackView(" /addorder", bot.ViewCallbackAddorder(sOrder, sCorzina))
+	//deleteshoppcartposition
+	Ourbot.RegisterCallbackView("/deleteshoppcartposition", bot.ViewCallbackdeleteshoppcartposition(sCorzina))
 	//
 	if err := Ourbot.Run(ctx); err != nil {
 		if !errors.Is(err, context.Canceled) {

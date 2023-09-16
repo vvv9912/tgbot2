@@ -16,7 +16,7 @@ import (
 func ViewCallbackAddcorzine(c botkit.CorzinaStorager) botkit.ViewFunc {
 
 	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update, botInfo botkit.BotInfo) error {
-
+		fmt.Println("add")
 		var Data botkit.BotCommand
 		err := json.Unmarshal([]byte(update.CallbackQuery.Data), &Data)
 		if err != nil {
@@ -41,7 +41,7 @@ func ViewCallbackAddcorzine(c botkit.CorzinaStorager) botkit.ViewFunc {
 					TgId:      botInfo.TgId,
 					Article:   MsgAddCorzine.Article,
 					Quantity:  1,
-					CreatedAt: time.Time{},
+					CreatedAt: time.Now().UTC().Add(3 * time.Hour),
 				})
 				if err != nil {
 					log.Println(err)
@@ -55,7 +55,7 @@ func ViewCallbackAddcorzine(c botkit.CorzinaStorager) botkit.ViewFunc {
 					return err
 				}
 				answ := tgbotapi.CallbackConfig{CallbackQueryID: update.CallbackQuery.ID, Text: "Добавлено в корзину!"}
-				_, err = bot.Send(answ)
+				bot.Send(answ)
 				if err != nil {
 					fmt.Println(err)
 					return err
@@ -65,7 +65,7 @@ func ViewCallbackAddcorzine(c botkit.CorzinaStorager) botkit.ViewFunc {
 			log.Fatalln(err)
 			return err
 		}
-		if corz == (model.Corzine{}) { //Проверка на всякий случай
+		if corz == (model.Corzine{}) { //Проверка на всякий случай //если корзина пуста
 			err = c.AddCorzinas(ctx, model.Corzine{
 				TgId:      botInfo.TgId,
 				Article:   MsgAddCorzine.Article,
@@ -99,13 +99,13 @@ func ViewCallbackAddcorzine(c botkit.CorzinaStorager) botkit.ViewFunc {
 			return err
 		}
 		msg := tgbotapi.NewMessage(botInfo.TgId, "Добавлено в корзину!")
-		_, err = bot.Send(msg)
+		bot.Send(msg)
 		if err != nil {
 			fmt.Println(err)
 			return err
 		}
 		answ := tgbotapi.CallbackConfig{CallbackQueryID: update.CallbackQuery.ID, Text: "Добавлено в корзину!"}
-		_, err = bot.Send(answ)
+		bot.Send(answ)
 		if err != nil {
 			fmt.Println(err)
 			return err

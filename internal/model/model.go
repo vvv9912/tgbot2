@@ -39,6 +39,7 @@ type Orders struct {
 	Pvz         string    `json:"pvz,omitempty"`
 	Order       string    `json:"order,omitempty"`
 	CreatedAt   time.Time `json:"created_at"`
+	ReadAt      time.Time `json:"read_at"`
 }
 
 type Users struct {

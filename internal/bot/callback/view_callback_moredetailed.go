@@ -6,7 +6,6 @@ import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
-	"strconv"
 	"tgbotv2/internal/botkit"
 )
 
@@ -20,18 +19,19 @@ func ViewCallbackMoredetailed(p botkit.ProductsStorager, c botkit.CorzinaStorage
 			log.Printf("[ERROR] Json преобразование callback %v", err)
 			return err
 		}
-		article, err := strconv.Atoi(Data.Data)
+		var MsgAddCorzine AddCorzine
+		err = json.Unmarshal([]byte(Data.Data), &MsgAddCorzine)
 		if err != nil {
-			log.Println("[ERROR] Strconv in MoreDetailed %v", err)
+			log.Printf("[ERROR] Json преобразование callback %v", err)
 			return err
 		}
-		product, err := p.ProductByArticle(ctx, article)
+		product, err := p.ProductByArticle(ctx, MsgAddCorzine.Article)
 		//Обновлять предыдущее сообщение (добавлять подробности)
 		//todo
 		if product.Article == 0 {
 			return err //todo
 		}
-		if product.PhotoUrl != nil {
+		if len(product.PhotoUrl) != 0 {
 
 			text := fmt.Sprintf("Артикул: %d\nНазвание: %s\n%s\nЦена: %0.2fрублей\n", product.Article, product.Name, product.Description, product.Price)
 			ms1 := tgbotapi.NewEditMessageCaption(botInfo.TgId, update.CallbackQuery.Message.MessageID, text)

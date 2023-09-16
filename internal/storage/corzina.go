@@ -12,6 +12,7 @@ type CorzinaPostgresStorage struct {
 	db *sqlx.DB
 }
 
+// добавить мютексы
 func NewCorzinaPostgresStorage(db *sqlx.DB) *CorzinaPostgresStorage {
 	return &CorzinaPostgresStorage{db: db}
 }
@@ -58,7 +59,6 @@ func (s *CorzinaPostgresStorage) CorzinaByTgId(ctx context.Context, tgId int64) 
 		tgId); err != nil {
 		return nil, err
 	}
-
 	return lo.Map(corzine, func(corzin dbCorzine, _ int) model.Corzine { return model.Corzine(corzin) }), nil
 }
 
@@ -136,6 +136,35 @@ func (s *CorzinaPostgresStorage) CorzinaByTgIdwithCalalog(ctx context.Context, t
 	}
 
 	return corzineall, nil
+}
+func (s *CorzinaPostgresStorage) DeleteCorzinaByTgID(ctx context.Context, tgId int64) error {
+	conn, err := s.db.Connx(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	//var products []model.Products
+	row, err := conn.QueryxContext(ctx, `DELETE FROM corzina WHERE tg_id = $1;`, tgId)
+	defer row.Close()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *CorzinaPostgresStorage) DeleteCorzinaByTgIDandArticle(ctx context.Context, tgId int64, article int) error {
+	conn, err := s.db.Connx(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	//var products []model.Products
+	row, err := conn.QueryxContext(ctx, `DELETE FROM corzina WHERE (tg_id = $1 and article = $2);`, tgId, article)
+	defer row.Close()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 type DbCorzineCatalog struct {
