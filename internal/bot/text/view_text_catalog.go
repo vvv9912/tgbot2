@@ -24,6 +24,7 @@ func ViewTextCatalog(s botkit.ProductsStorager) botkit.ViewFunc {
 			return nil
 
 		}
+
 		var numKeyInline tgbotapi.InlineKeyboardMarkup
 		numKeyInline.InlineKeyboard = make([][]tgbotapi.InlineKeyboardButton, len(catalog))
 		for i := range numKeyInline.InlineKeyboard {

@@ -1,4 +1,4 @@
-package callback
+package callback_adddb
 
 import (
 	"context"
@@ -13,6 +13,7 @@ func ViewCallbackAdddatabase(u botkit.UsersStorager) botkit.ViewFunc {
 	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update, botInfo botkit.BotInfo) error {
 		//Тут добавляем нашему админу состояние.
 		//состояние 100 - ждем файл
+
 		err := u.UpdateStateByTgID(ctx, botInfo.TgId, constant.U_STATE_ADDDB_WAIT_FILE)
 		if err != nil {
 			fmt.Println("[ERROR] Update state: ", err)

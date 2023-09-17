@@ -16,6 +16,7 @@ func ViewCmdButton() botkit.ViewFunc {
 		tgbotapi.NewKeyboardButtonRow(
 			tgbotapi.NewKeyboardButton("FAQ"),
 			tgbotapi.NewKeyboardButton("HELP"),
+
 			//tgbotapi.NewKeyboardButton("6"),
 		),
 	)

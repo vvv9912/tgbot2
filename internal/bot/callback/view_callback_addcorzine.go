@@ -16,7 +16,6 @@ import (
 func ViewCallbackAddcorzine(c botkit.CorzinaStorager) botkit.ViewFunc {
 
 	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update, botInfo botkit.BotInfo) error {
-		fmt.Println("add")
 		var Data botkit.BotCommand
 		err := json.Unmarshal([]byte(update.CallbackQuery.Data), &Data)
 		if err != nil {

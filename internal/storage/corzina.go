@@ -128,7 +128,12 @@ func (s *CorzinaPostgresStorage) CorzinaByTgIdwithCalalog(ctx context.Context, t
        		   p.article AS c_article,
        		   corzina.quantity AS c_quantity,
        		   p.catalog AS c_catalog,
-       		   p.name AS c_name
+       		   p.name AS c_name,
+			   p.price AS c_price,
+			   p.length AS c_length,
+			   p.width as c_width,
+			   p.heigth as c_height,
+			   p.weight as c_weight
 			   FROM  corzina
 			   LEFT JOIN public.products p on corzina.article = p.article  where tg_id = $1 GROUP BY id, p.article;`,
 		tgId); err != nil {
@@ -168,10 +173,15 @@ func (s *CorzinaPostgresStorage) DeleteCorzinaByTgIDandArticle(ctx context.Conte
 }
 
 type DbCorzineCatalog struct {
-	ID       int    `db:"c_id"`
-	TgId     int64  `db:"c_tg_id"`
-	Article  int    `db:"c_article"` //В наличии
-	Quantity int    `db:"c_quantity"`
-	Catalog  string `db:"c_catalog,"`
-	Name     string `db:"c_name"`
+	ID       int     `db:"c_id"`
+	TgId     int64   `db:"c_tg_id"`
+	Article  int     `db:"c_article"` //В наличии
+	Quantity int     `db:"c_quantity"`
+	Catalog  string  `db:"c_catalog,"`
+	Name     string  `db:"c_name"`
+	Price    float64 `db:"c_price"`
+	Length   int     `db:"c_length"`
+	Width    int     `db:"c_width"`
+	Height   int     `db:"c_height"`
+	Weight   int     `db:"c_weight"`
 }

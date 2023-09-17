@@ -69,8 +69,10 @@ func (m *Middleware) MwUsersOnly(next botkit.ViewFunc) botkit.ViewFunc {
 			//
 		}
 
-		next(ctx, bot, update, botInfo)
-
+		err = next(ctx, bot, update, botInfo)
+		if err != nil {
+			return err
+		}
 		return nil
 	}
 }

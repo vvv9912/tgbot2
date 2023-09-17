@@ -71,7 +71,7 @@ func ViewCallbackUcatalog(s botkit.ProductsStorager) botkit.ViewFunc {
 				podrobnee, err := json.Marshal(data)
 				dataMsg := botkit.BotCommand{
 					Cmd:  "/addCorzine",
-					Data: string(msgAddCorz),
+					Data: string(msgAddCorz), //не над
 				}
 				sss, err := json.Marshal(dataMsg)
 				if err != nil {

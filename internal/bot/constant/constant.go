@@ -21,3 +21,8 @@ const (
 	//E_STATE_ADDCARD_SHOW            = 106
 	//E_STATE_ADMIN_MAX               = 499
 )
+
+const (
+	D_SAMOVIVOZ int = 1
+	D_SDEK          = 1
+)

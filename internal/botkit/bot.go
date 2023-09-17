@@ -3,6 +3,7 @@ package botkit
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"tgbotv2/internal/model"
 	"tgbotv2/internal/storage"
@@ -17,6 +18,7 @@ import (
 
 type OrderStorager interface {
 	AddOrders(ctx context.Context, order model.Orders) error
+	OrdersByTgID(ctx context.Context, tgId int64) ([]model.Orders, error)
 }
 type CorzinaStorager interface {
 	AddCorzinas(ctx context.Context, corz model.Corzine) error
@@ -164,6 +166,7 @@ func (b *Bot) handleUpdate(ctx context.Context, update tgbotapi.Update) {
 	if err := view(ctx, b.api, update, botInfo); err != nil {
 		log.Printf("[ERROR] failed to handle update: %v", err)
 
+		b.api.Send(tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintln(err)))
 		if _, err := b.api.Send(
 			tgbotapi.NewMessage(update.Message.Chat.ID, "internal error"),
 		); err != nil {
