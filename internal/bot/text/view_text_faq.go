@@ -8,15 +8,13 @@ import (
 
 func ViewTextFaq() botkit.ViewFunc {
 	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update, botInfo botkit.BotInfo) error {
-		var numericKeyboardInline = tgbotapi.NewInlineKeyboardMarkup(
-			tgbotapi.NewInlineKeyboardRow(
-				tgbotapi.NewInlineKeyboardButtonURL("Каталог", "https://"),
-				//tgbotapi.NewInlineKeyboardButtonData("Добавить в корзину", string(sss)),
+		var numericKeyboard = tgbotapi.NewReplyKeyboard(
+			tgbotapi.NewKeyboardButtonRow(
+				tgbotapi.NewKeyboardButtonWebApp("Приложенька ", tgbotapi.WebAppInfo{URL: "https://google.com"}),
 			),
 		)
-
 		msg := tgbotapi.NewMessage(botInfo.TgId, "лял")
-		msg.ReplyMarkup = numericKeyboardInline
+		msg.ReplyMarkup = numericKeyboard
 		bot.Send(msg) //todo
 
 		return nil
