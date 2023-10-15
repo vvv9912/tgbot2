@@ -45,19 +45,36 @@ func ViewCallbackUcatalog(s botkit.ProductsStorager) botkit.ViewFunc {
 
 			if len(sProducts[i].PhotoUrl) != 0 {
 
-				//photoBytes, err := ioutil.ReadFile(sProducts[i].PhotoUrl)
-				//photoBytes, err := ioutil.ReadFile("")
-				//_ = err
-				photoFileBytes := tgbotapi.FileBytes{
-					Name:  "photo",
-					Bytes: sProducts[i].PhotoUrl,
+				//todo photo
+				//var mediaGroup []interface{}
+				//for k := range sProducts[i].PhotoUrl {
+				var mediaGroup []interface{}
+				//if len(sProducts[i].PhotoUrl) > 1 {
+				for k := range sProducts[i].PhotoUrl {
+					photoFileBytes := tgbotapi.FileBytes{
+						Name:  "photo1.jpg",
+						Bytes: sProducts[i].PhotoUrl[k],
+					}
+					photo1 := tgbotapi.NewInputMediaPhoto(photoFileBytes)
+					if k == 0 {
+						photo1.Caption = sProducts[i].Name //описание строго под одной фото
+					}
+
+					mediaGroup = append(mediaGroup, photo1)
 				}
 
-				msg := tgbotapi.NewPhoto(update.CallbackQuery.From.ID, nil)
-				msg.File = photoFileBytes
-
-				//sss := fmt.Sprintf("/addCorzine\narticle:%d\ncategory:%s", sProducts[i].Article, sProducts[i].Catalog) //todo
-				//Завернули структуру в структуру (джсон в джсон)
+				msg := tgbotapi.NewMediaGroup(update.CallbackQuery.From.ID, mediaGroup)
+				bot.Send(msg)
+				//} else {
+				//	photoFileBytes := tgbotapi.FileBytes{
+				//		Name:  "photo2.jpg",
+				//		Bytes: sProducts[i].PhotoUrl[0],
+				//	}
+				//	//photo1 := tgbotapi.NewInputMediaPhoto(photoFileBytes)
+				//	msg := tgbotapi.NewPhoto(update.CallbackQuery.From.ID, photoFileBytes)
+				//	bot.Send(msg)
+				//}
+				//bot.Send(msg) //json: cannot unmarshal array into Go value of type tgbotapi.Message
 
 				dataAddCorz := AddCorzine{
 					Article: sProducts[i].Article,
@@ -77,20 +94,23 @@ func ViewCallbackUcatalog(s botkit.ProductsStorager) botkit.ViewFunc {
 				if err != nil {
 					log.Println("") //todo
 				}
-				msg.Caption = text
+
 				var numericKeyboardInline = tgbotapi.NewInlineKeyboardMarkup(
 					tgbotapi.NewInlineKeyboardRow(
 						tgbotapi.NewInlineKeyboardButtonData("Подробнее", string(podrobnee)),
 						tgbotapi.NewInlineKeyboardButtonData("Добавить в корзину", string(sss)),
 					),
 				)
+				msg2 := tgbotapi.NewMessage(update.CallbackQuery.From.ID, text)
 
-				msg.ReplyMarkup = numericKeyboardInline
-				_, err = bot.Send(msg) //todo
+				_ = numericKeyboardInline
+				msg2.ReplyMarkup = numericKeyboardInline
+				_, err = bot.Send(msg2) //todo
 				if err != nil {
 					log.Println(err)
 					return err
 				}
+				//	}
 			} else { //если нет фото
 				msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, text)
 				//text = `<a href="tg://btn/dmVyeSBsb25nIHN0cmluZwBldmVuIGxvbmdlciBzdHJpbmcAZXZlsadssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssbiBsb25nZXIgc3RpbGwgc3RyaW5n">\u200b</a>` + text

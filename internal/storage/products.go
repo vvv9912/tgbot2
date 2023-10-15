@@ -3,7 +3,7 @@ package storage
 import (
 	"context"
 	"github.com/jmoiron/sqlx"
-	"github.com/samber/lo"
+	"github.com/lib/pq"
 	"tgbotv2/internal/model"
 )
 
@@ -30,7 +30,7 @@ func (s *ProductsPostgresStorage) AddProduct(ctx context.Context, product model.
 		product.Catalog,
 		product.Name,
 		product.Description,
-		product.PhotoUrl,
+		pq.Array(product.PhotoUrl),
 		product.Price,
 		product.Length,
 		product.Width,
@@ -65,9 +65,9 @@ func (s *ProductsPostgresStorage) ProductsByCatalog(ctx context.Context, ctlg st
 	}
 	defer conn.Close()
 	//var products []model.Products
-	var products []dbProduct
+	var getProducts []getdbProduct
 	if err := conn.SelectContext(ctx,
-		&products,
+		&getProducts,
 		`SELECT
      article AS a_article,
      catalog AS a_catalog,
@@ -80,8 +80,35 @@ func (s *ProductsPostgresStorage) ProductsByCatalog(ctx context.Context, ctlg st
 		ctlg); err != nil {
 		return nil, err
 	}
+	// Создайте срез для хранения данных в формате dbProduct
+	var products []model.Products
 
-	return lo.Map(products, func(product dbProduct, _ int) model.Products { return model.Products(product) }), nil
+	for _, getProduct := range getProducts {
+		// Преобразуйте PhotoUrl из pq.ByteaArray в [][]byte
+		var photoUrls [][]byte
+		for _, byteData := range getProduct.PhotoUrl {
+			photoUrls = append(photoUrls, []byte(byteData))
+		}
+
+		// Создайте экземпляр dbProduct и заполните его данными
+		product := model.Products{
+			Article:     getProduct.Article,
+			Catalog:     getProduct.Catalog,
+			Name:        getProduct.Name,
+			Description: getProduct.Description,
+			PhotoUrl:    photoUrls,
+			Price:       getProduct.Price,
+			Length:      getProduct.Length,
+			Width:       getProduct.Width,
+			Height:      getProduct.Height,
+			Weight:      getProduct.Weight,
+		}
+
+		// Добавьте созданный экземпляр в срез products
+		products = append(products, product)
+	}
+	//return lo.Map(products, func(product dbProduct, _ int) model.Products { return model.Products(product) }), nil
+	return products, nil
 }
 func (s *ProductsPostgresStorage) ProductByArticle(ctx context.Context, article int) (model.Products, error) {
 	conn, err := s.db.Connx(ctx)
@@ -106,12 +133,13 @@ func (s *ProductsPostgresStorage) ProductByArticle(ctx context.Context, article 
 	 			FROM products
 	 			WHERE (article = $1)`,
 		article)
+	var photoUrl pq.ByteaArray
 	err = row.Scan(
 		&products.Article,
 		&products.Catalog,
 		&products.Name,
 		&products.Description,
-		&products.PhotoUrl,
+		&photoUrl,
 		&products.Price,
 		&products.Length,
 		&products.Width,
@@ -120,7 +148,7 @@ func (s *ProductsPostgresStorage) ProductByArticle(ctx context.Context, article 
 	if err != nil {
 		return model.Products{}, err
 	}
-
+	products.PhotoUrl = photoUrl
 	return model.Products{
 		Article:     products.Article,
 		Catalog:     products.Catalog,
@@ -136,14 +164,26 @@ func (s *ProductsPostgresStorage) ProductByArticle(ctx context.Context, article 
 }
 
 type dbProduct struct {
-	Article     int     `db:"a_article"`
-	Catalog     string  `db:"a_catalog"`
-	Name        string  `db:"a_name"`
-	Description string  `db:"a_description"`
-	PhotoUrl    []byte  `db:"a_photo_url"`
-	Price       float64 `db:"a_price"`
-	Length      int     `db:"a_length"`
-	Width       int     `db:"a_width"`
-	Height      int     `db:"a_height"`
-	Weight      int     `db:"a_weight"`
+	Article     int      `db:"a_article"`
+	Catalog     string   `db:"a_catalog"`
+	Name        string   `db:"a_name"`
+	Description string   `db:"a_description"`
+	PhotoUrl    [][]byte `db:"a_photo_url"`
+	Price       float64  `db:"a_price"`
+	Length      int      `db:"a_length"`
+	Width       int      `db:"a_width"`
+	Height      int      `db:"a_height"`
+	Weight      int      `db:"a_weight"`
+}
+type getdbProduct struct {
+	Article     int           `db:"a_article"`
+	Catalog     string        `db:"a_catalog"`
+	Name        string        `db:"a_name"`
+	Description string        `db:"a_description"`
+	PhotoUrl    pq.ByteaArray `db:"a_photo_url"`
+	Price       float64       `db:"a_price"`
+	Length      int           `db:"a_length"`
+	Width       int           `db:"a_width"`
+	Height      int           `db:"a_height"`
+	Weight      int           `db:"a_weight"`
 }

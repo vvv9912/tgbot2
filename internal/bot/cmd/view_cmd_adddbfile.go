@@ -94,32 +94,38 @@ func ViewCmdAdddbfile(p botkit.ProductsStorager) botkit.ViewFunc {
 			return errors.New("pars file db")
 		}
 		for i := range *indb {
-			var photoBytes []byte
-			if (*indb)[i].PhotoUrl != "" {
-				//ппроверка неправильного пути
-				if strings.Contains((*indb)[i].PhotoUrl, fmt.Sprintf(`\`)) {
-					a := strings.Split((*indb)[i].PhotoUrl, `\`)
-					var photoUrl string
-					for i := range a {
-						photoUrl = path.Join(photoUrl, a[i])
+
+			photosBytes := make([][]byte, 0)
+			if len((*indb)[i].PhotoUrl) != 0 {
+				for k := range (*indb)[i].PhotoUrl {
+					var photoBytes []byte
+					if strings.Contains((*indb)[i].PhotoUrl[k], fmt.Sprintf(`\`)) {
+						a := strings.Split((*indb)[i].PhotoUrl[k], `\`)
+						var photoUrl string
+						for i := range a {
+							photoUrl = path.Join(photoUrl, a[i])
+						}
+						photoBytes, err = ioutil.ReadFile(path.Join(pathdir, photoUrl))
+						if err != nil {
+							return err
+						}
+					} else {
+						photoBytes, err = ioutil.ReadFile(path.Join(pathdir, (*indb)[i].PhotoUrl[k]))
+						if err != nil {
+							return err
+						}
 					}
-					photoBytes, err = ioutil.ReadFile(path.Join(pathdir, photoUrl))
-					if err != nil {
-						return err
-					}
-				} else {
-					photoBytes, err = ioutil.ReadFile(path.Join(pathdir, (*indb)[i].PhotoUrl))
-					if err != nil {
-						return err
-					}
+					photosBytes = append(photosBytes, photoBytes)
 				}
+				//ппроверка неправильного пути
+
 			}
-			err = p.AddProduct(ctx, model.Products{
+			err = p.AddProduct(context.TODO(), model.Products{
 				Article:     (*indb)[i].Article,
 				Catalog:     (*indb)[i].Catalog,
 				Name:        (*indb)[i].Name,
 				Description: (*indb)[i].Description,
-				PhotoUrl:    photoBytes,
+				PhotoUrl:    photosBytes,
 				Price:       (*indb)[i].Price,
 				Length:      (*indb)[i].Length,
 				Width:       (*indb)[i].Width,

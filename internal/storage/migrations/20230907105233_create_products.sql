@@ -5,7 +5,7 @@ CREATE TABLE products (
     catalog text,
     name text,
     description text, --varchar(255)
-    photo_url bytea,
+    photo_url bytea[],
     price FLOAT,
     length integer,
     width integer,

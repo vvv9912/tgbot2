@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/xuri/excelize/v2"
 	"strconv"
+	"strings"
 )
 
 // todo
@@ -78,7 +79,9 @@ func (e *Excel) Read() *[]ProductsPars {
 			return nil
 		}
 		if len(rows[i]) > 9 {
-			products[i-1].PhotoUrl = rows[i][9]
+			a := rows[i][9]
+			b := strings.Split(a, ",")
+			products[i-1].PhotoUrl = b
 		}
 	}
 	//for _, row := range rows {
@@ -91,14 +94,14 @@ func (e *Excel) Read() *[]ProductsPars {
 }
 
 type ProductsPars struct {
-	Article     int     `json:"article,omitempty"`
-	Catalog     string  `json:"catalog,omitempty"`
-	Name        string  `json:"name,omitempty"`
-	Description string  `json:"description,omitempty"`
-	PhotoUrl    string  `json:"photo_url,omitempty"`
-	Price       float64 `json:"price,omitempty"`
-	Length      int     `json:"length"`
-	Width       int     `json:"width"`
-	Height      int     `json:"height"`
-	Weight      int     `json:"weight"`
+	Article     int      `json:"article,omitempty"`
+	Catalog     string   `json:"catalog,omitempty"`
+	Name        string   `json:"name,omitempty"`
+	Description string   `json:"description,omitempty"`
+	PhotoUrl    []string `json:"photo_url,omitempty"`
+	Price       float64  `json:"price,omitempty"`
+	Length      int      `json:"length"`
+	Width       int      `json:"width"`
+	Height      int      `json:"height"`
+	Weight      int      `json:"weight"`
 }

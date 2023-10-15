@@ -14,7 +14,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - db:/var/lib/postgresql/data/
+      - /home/vlad/Docker/postgresqlBot:/var/lib/postgresql/data/
 
 volumes:
   db:

@@ -5,16 +5,16 @@ import (
 )
 
 type Products struct {
-	Article     int     `json:"article,omitempty"`
-	Catalog     string  `json:"catalog,omitempty"`
-	Name        string  `json:"name,omitempty"`
-	Description string  `json:"description,omitempty"`
-	PhotoUrl    []byte  `json:"photo_url,omitempty"`
-	Price       float64 `json:"price,omitempty"`
-	Length      int     `json:"length"`
-	Width       int     `json:"width"`
-	Height      int     `json:"height"`
-	Weight      int     `json:"weight"`
+	Article     int      `json:"article,omitempty"`
+	Catalog     string   `json:"catalog,omitempty"`
+	Name        string   `json:"name,omitempty"`
+	Description string   `json:"description,omitempty"`
+	PhotoUrl    [][]byte `json:"photo_url,omitempty"`
+	Price       float64  `json:"price,omitempty"`
+	Length      int      `json:"length"`
+	Width       int      `json:"width"`
+	Height      int      `json:"height"`
+	Weight      int      `json:"weight"`
 }
 
 //	type Products struct {
