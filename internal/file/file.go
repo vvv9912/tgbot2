@@ -23,11 +23,17 @@ func savefile(outfile tgbotapi.File) (string, error) {
 	p2 := "photo"
 	f := path.Join(p1, p2, filename)
 	resp, err := http.Get(pathserv)
-	_ = err
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
 	out, err := os.Create(f)
 	defer out.Close()
-	n, err := io.Copy(out, resp.Body)
-	_ = n //todo
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
 	defer resp.Body.Close()
 	return f, err
 }

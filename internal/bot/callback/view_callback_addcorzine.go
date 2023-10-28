@@ -97,7 +97,7 @@ func ViewCallbackAddcorzine(c botkit.CorzinaStorager) botkit.ViewFunc {
 			log.Println(err)
 			return err
 		}
-		msg := tgbotapi.NewMessage(botInfo.TgId, "Добавлено в корзину!")
+		msg := tgbotapi.NewMessage(botInfo.TgId, "Добавлено вif err !=  корзину!")
 		bot.Send(msg)
 		if err != nil {
 			fmt.Println(err)
